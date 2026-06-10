@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calc</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #e8eaf0;
+    --glass-bg: rgba(255,255,255,0.35);
+    --glass-border: rgba(255,255,255,0.6);
+    --glass-shadow: rgba(0,0,0,0.12);
+    --btn-bg: rgba(255,255,255,0.45);
+    --btn-hover: rgba(255,255,255,0.65);
+    --btn-active: rgba(255,255,255,0.25);
+    --btn-op-bg: rgba(100,140,255,0.25);
+    --btn-op-hover: rgba(100,140,255,0.4);
+    --btn-eq-bg: rgba(80,120,255,0.85);
+    --btn-eq-hover: rgba(60,100,240,0.95);
+    --text: #1a1a2e;
+    --text-secondary: rgba(26,26,46,0.55);
+    --display-bg: rgba(255,255,255,0.2);
+    --toggle-bg: rgba(0,0,0,0.12);
+    --toggle-thumb: rgba(255,255,255,0.9);
+    --paywall-bg: rgba(30,35,70,0.92);
+    --paywall-card: rgba(50,60,120,0.85);
+    --paywall-border: rgba(100,120,255,0.35);
+    --paywall-text: #f0f4ff;
+    --paywall-sub: rgba(200,210,255,0.7);
+    --paywall-btn-active: rgba(80,120,255,1);
+    --paywall-selected: rgba(80,120,255,0.3);
+    --paywall-selected-border: rgba(100,140,255,0.7);
+    --error-bg: rgba(30,35,70,0.96);
+    --error-icon: #ef9f27;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0f1020;
+    --glass-bg: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.15);
+    --glass-shadow: rgba(0,0,0,0.45);
+    --btn-bg: rgba(255,255,255,0.08);
+    --btn-hover: rgba(255,255,255,0.15);
+    --btn-active: rgba(255,255,255,0.04);
+    --btn-op-bg: rgba(100,140,255,0.18);
+    --btn-op-hover: rgba(100,140,255,0.3);
+    --btn-eq-bg: rgba(80,120,255,0.9);
+    --btn-eq-hover: rgba(60,100,240,1);
+    --text: #f0f4ff;
+    --text-secondary: rgba(200,210,255,0.45);
+    --display-bg: rgba(0,0,0,0.2);
+    --toggle-bg: rgba(255,255,255,0.1);
+    --toggle-thumb: rgba(255,255,255,0.85);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    transition: background 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 20% 20%, rgba(120,140,255,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 70%, rgba(180,100,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 60% 10%, rgba(80,200,255,0.1) 0%, transparent 55%);
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  [data-theme="dark"] body::before {
+    background:
+      radial-gradient(ellipse 70% 60% at 20% 20%, rgba(80,100,255,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 70%, rgba(140,60,255,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 60% 10%, rgba(40,160,255,0.15) 0%, transparent 55%);
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+
+  .theme-toggle:hover { background: var(--btn-hover); }
+
+  .toggle-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    opacity: 0.8;
+    transition: color 0.3s;
+  }
+
+  .toggle-track {
+    width: 36px;
+    height: 20px;
+    background: var(--toggle-bg);
+    border-radius: 100px;
+    position: relative;
+    transition: background 0.3s;
+    border: 1px solid var(--glass-border);
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--toggle-thumb);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  [data-theme="dark"] .toggle-thumb { transform: translateX(16px); }
+
+  .calc-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .calc-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .calc {
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px) saturate(1.8);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    padding: 20px;
+    width: 320px;
+    box-shadow:
+      0 8px 32px var(--glass-shadow),
+      inset 0 1px 0 rgba(255,255,255,0.5),
+      inset 0 -1px 0 rgba(255,255,255,0.1);
+    transition: all 0.4s ease;
+  }
+
+  .display {
+    background: var(--display-bg);
+    border-radius: 18px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .expression {
+    font-size: 14px;
+    color: var(--text-secondary);
+    min-height: 18px;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+    text-align: right;
+  }
+
+  .result {
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    word-break: break-all;
+    text-align: right;
+    transition: font-size 0.15s;
+    line-height: 1.1;
+  }
+
+  .result.sm { font-size: 28px; }
+  .result.xs { font-size: 20px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .btn {
+    height: 64px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    background: var(--btn-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px var(--glass-shadow);
+    letter-spacing: 0.01em;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:hover { background: var(--btn-hover); transform: translateY(-1px); }
+  .btn:active { background: var(--btn-active); transform: translateY(0) scale(0.96); box-shadow: none; }
+
+  .btn.op {
+    background: var(--btn-op-bg);
+    color: rgba(80,120,255,1);
+    font-weight: 500;
+  }
+  [data-theme="dark"] .btn.op { color: rgba(140,170,255,1); }
+  .btn.op:hover { background: var(--btn-op-hover); }
+
+  .btn.fn {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: rgba(0,0,0,0.06);
+  }
+  [data-theme="dark"] .btn.fn { background: rgba(255,255,255,0.05); }
+
+  .btn.eq {
+    background: var(--btn-eq-bg);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 400;
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(80,120,255,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn.eq:hover { background: var(--btn-eq-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(80,120,255,0.45); }
+
+  .btn.span2 { grid-column: span 2; }
+
+  /* PAYWALL OVERLAY */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    backdrop-filter: none;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  .overlay.active {
+    opacity: 1;
+    pointer-events: all;
+    backdrop-filter: blur(20px) saturate(1.4) brightness(0.7);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4) brightness(0.7);
+    background: rgba(10,10,30,0.3);
+  }
+
+  .paywall {
+    background: var(--paywall-bg);
+    backdrop-filter: blur(40px) saturate(2);
+    -webkit-backdrop-filter: blur(40px) saturate(2);
+    border: 1px solid var(--paywall-border);
+    border-radius: 28px;
+    padding: 36px 28px 28px;
+    width: 340px;
+    max-width: calc(100vw - 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.35s cubic-bezier(0.34,1.3,0.64,1);
+    position: relative;
+  }
+
+  .overlay.active .paywall {
+    transform: translateY(0) scale(1);
+  }
+
+  .paywall-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: rgba(200,210,255,0.7);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .paywall-close:hover { background: rgba(255,255,255,0.18); }
+
+  .lock-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(80,120,255,0.25);
+    border: 1px solid rgba(100,140,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  .lock-svg { width: 26px; height: 26px; fill: none; stroke: rgba(140,170,255,0.95); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .paywall-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--paywall-text);
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .paywall-sub {
+    font-size: 14px;
+    color: var(--paywall-sub);
+    text-align: center;
+    line-height: 1.55;
+    margin-bottom: 24px;
+    max-width: 260px;
+  }
+
+  .plan-option {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+  .plan-option:hover { background: rgba(255,255,255,0.1); }
+  .plan-option.selected {
+    background: var(--paywall-selected);
+    border-color: var(--paywall-selected-border);
+  }
+
+  .plan-label { font-size: 14px; font-weight: 600; color: var(--paywall-text); }
+  .plan-desc { font-size: 12px; color: var(--paywall-sub); margin-top: 2px; }
+  .plan-price { font-size: 18px; font-weight: 700; color: var(--paywall-text); }
+  .plan-period { font-size: 11px; color: var(--paywall-sub); }
+
+  .pay-btn {
+    width: 100%;
+    height: 52px;
+    background: var(--paywall-btn-active);
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 20px rgba(80,120,255,0.4);
+  }
+  .pay-btn:hover { background: rgba(60,100,240,1); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(80,120,255,0.5); }
+  .pay-btn:active { transform: scale(0.98); }
+
+  /* ERROR MODAL */
+  .error-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,30,0.5);
+    backdrop-filter: blur(24px) brightness(0.6);
+    -webkit-backdrop-filter: blur(24px) brightness(0.6);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .error-overlay.active { opacity: 1; pointer-events: all; }
+
+  .error-modal {
+    background: var(--error-bg);
+    border: 1px solid rgba(239,159,39,0.35);
+    border-radius: 24px;
+    padding: 32px 28px;
+    width: 300px;
+    max-width: calc(100vw - 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1);
+  }
+  .error-overlay.active .error-modal { transform: scale(1); }
+
+  .error-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(239,159,39,0.15);
+    border: 1px solid rgba(239,159,39,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 22px;
+  }
+
+  .error-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0f4ff;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .error-msg {
+    font-size: 13px;
+    color: rgba(200,210,255,0.7);
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+
+  .error-ok {
+    width: 100%;
+    height: 46px;
+    background: rgba(239,159,39,0.85);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(239,159,39,0.3);
+  }
+  .error-ok:hover { background: rgba(239,159,39,1); }
+</style>
+</head>
+<body>
+
+<div class="theme-toggle" onclick="toggleTheme()" role="button" aria-label="Toggle dark mode">
+  <span class="toggle-label" id="theme-lbl">Light</span>
+  <div class="toggle-track">
+    <div class="toggle-thumb"></div>
+  </div>
+</div>
+
+<div class="calc-wrap">
+  <div class="calc-title">Calculator</div>
+  <div class="calc">
+    <div class="display">
+      <div class="expression" id="expr"></div>
+      <div class="result" id="result">0</div>
+    </div>
+    <div class="grid">
+      <button class="btn fn" onclick="calcFn('clear')">AC</button>
+      <button class="btn fn" onclick="calcFn('sign')">+/−</button>
+      <button class="btn fn" onclick="calcFn('percent')">%</button>
+      <button class="btn op" onclick="inputOp('/')">÷</button>
+
+      <button class="btn" onclick="inputNum('7')">7</button>
+      <button class="btn" onclick="inputNum('8')">8</button>
+      <button class="btn" onclick="inputNum('9')">9</button>
+      <button class="btn op" onclick="inputOp('*')">×</button>
+
+      <button class="btn" onclick="inputNum('4')">4</button>
+      <button class="btn" onclick="inputNum('5')">5</button>
+      <button class="btn" onclick="inputNum('6')">6</button>
+      <button class="btn op" onclick="inputOp('-')">−</button>
+
+      <button class="btn" onclick="inputNum('1')">1</button>
+      <button class="btn" onclick="inputNum('2')">2</button>
+      <button class="btn" onclick="inputNum('3')">3</button>
+      <button class="btn op" onclick="inputOp('+')">+</button>
+
+      <button class="btn span2" onclick="inputNum('0')">0</button>
+      <button class="btn" onclick="inputDot()">.</button>
+      <button class="btn eq" onclick="solve()">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- Paywall Overlay -->
+<div class="overlay" id="paywall-overlay">
+  <div class="paywall">
+    <button class="paywall-close" onclick="closePaywall()" aria-label="Close">✕</button>
+    <div class="lock-icon">
+      <svg class="lock-svg" viewBox="0 0 24 24">
+        <rect x="5" y="11" width="14" height="10" rx="2"/>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+      </svg>
+    </div>
+    <div class="paywall-title">Unlock the Solution</div>
+    <div class="paywall-sub">You've reached the limit of free calculations. Please choose a premium plan to see your result!</div>
+
+    <div class="plan-option" id="plan-one" onclick="selectPlan('one')">
+      <div>
+        <div class="plan-label">One-Time Calculation</div>
+        <div class="plan-desc">Unlock this specific answer</div>
+      </div>
+      <div style="text-align:right">
+        <div class="plan-price">$9.99</div>
+      </div>
+    </div>
+
+    <div class="plan-option selected" id="plan-pro" onclick="selectPlan('pro')">
+      <div>
+        <div class="plan-label">Calculator Pro</div>
+        <div class="plan-desc">Unlimited solutions</div>
+      </div>
+      <div style="text-align:right">
+        <div class="plan-price">$99.99</div>
+        <div class="plan-period">/mo</div>
+      </div>
+    </div>
+
+    <button class="pay-btn" onclick="payToUnlock()">Pay to Unlock</button>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="error-overlay" id="error-overlay">
+  <div class="error-modal">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Payment Failed</div>
+    <div class="error-msg">This action could not be completed. Please try again in 24 hours.</div>
+    <button class="error-ok" onclick="closeError()">Got it</button>
+  </div>
+</div>
+
+<script>
+  let current = '0';
+  let expression = '';
+  let operator = null;
+  let prevValue = null;
+  let newInput = true;
+  let hasExpression = false;
+  let rawExpr = '';
+
+  function updateDisplay() {
+    const r = document.getElementById('result');
+    r.textContent = current;
+    r.className = 'result' + (current.length > 12 ? ' xs' : current.length > 8 ? ' sm' : '');
+    document.getElementById('expr').textContent = rawExpr;
+  }
+
+  function inputNum(n) {
+    if (newInput) { current = n; newInput = false; }
+    else current = current === '0' ? n : current + n;
+    updateDisplay();
+  }
+
+  function inputDot() {
+    if (newInput) { current = '0.'; newInput = false; }
+    else if (!current.includes('.')) current += '.';
+    updateDisplay();
+  }
+
+  const opSymbols = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+  function inputOp(op) {
+    prevValue = parseFloat(current);
+    operator = op;
+    rawExpr = current + ' ' + opSymbols[op];
+    newInput = true;
+    updateDisplay();
+  }
+
+  function calcFn(fn) {
+    if (fn === 'clear') { current = '0'; expression = ''; operator = null; prevValue = null; newInput = true; rawExpr = ''; }
+    else if (fn === 'sign') current = String(parseFloat(current) * -1);
+    else if (fn === 'percent') current = String(parseFloat(current) / 100);
+    updateDisplay();
+  }
+
+  function solve() {
+    if (operator === null || prevValue === null) { showPaywall(); return; }
+    const cur = parseFloat(current);
+    rawExpr = prevValue + ' ' + opSymbols[operator] + ' ' + cur + ' =';
+    showPaywall();
+  }
+
+  function showPaywall() {
+    document.getElementById('paywall-overlay').classList.add('active');
+  }
+
+  function closePaywall() {
+    document.getElementById('paywall-overlay').classList.remove('active');
+  }
+
+  function selectPlan(p) {
+    document.getElementById('plan-one').classList.toggle('selected', p === 'one');
+    document.getElementById('plan-pro').classList.toggle('selected', p === 'pro');
+  }
+
+  function payToUnlock() {
+    closePaywall();
+    setTimeout(() => {
+      document.getElementById('error-overlay').classList.add('active');
+    }, 250);
+  }
+
+  function closeError() {
+    document.getElementById('error-overlay').classList.remove('active');
+  }
+
+  let dark = false;
+  function toggleTheme() {
+    dark = !dark;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : '');
+    document.getElementById('theme-lbl').textContent = dark ? 'Dark' : 'Light';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (/^[0-9]$/.test(e.key)) inputNum(e.key);
+    else if (e.key === '.') inputDot();
+    else if (['+','-','*','/'].includes(e.key)) inputOp(e.key);
+    else if (e.key === 'Enter' || e.key === '=') solve();
+    else if (e.key === 'Backspace') {
+      if (current.length > 1) current = current.slice(0,-1);
+      else current = '0';
+      updateDisplay();
+    }
+    else if (e.key === 'Escape') { closePaywall(); closeError(); }
+  });
+
+  updateDisplay();
+</script>
+</body>
+</html>
