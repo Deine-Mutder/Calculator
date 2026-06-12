@@ -24,14 +24,6 @@
     --display-bg: rgba(255,255,255,0.2);
     --toggle-bg: rgba(0,0,0,0.12);
     --toggle-thumb: rgba(255,255,255,0.9);
-    --paywall-bg: rgba(30,35,70,0.92);
-    --paywall-card: rgba(50,60,120,0.85);
-    --paywall-border: rgba(100,120,255,0.35);
-    --paywall-text: #f0f4ff;
-    --paywall-sub: rgba(200,210,255,0.7);
-    --paywall-btn-active: rgba(80,120,255,1);
-    --paywall-selected: rgba(80,120,255,0.3);
-    --paywall-selected-border: rgba(100,140,255,0.7);
     --error-bg: rgba(30,35,70,0.96);
     --error-icon: #ef9f27;
   }
@@ -166,7 +158,7 @@
     border: 1px solid var(--glass-border);
     border-radius: 32px;
     padding: 20px;
-    width: 320px;
+    width: 260px;
     box-shadow:
       0 8px 32px var(--glass-shadow),
       inset 0 1px 0 rgba(255,255,255,0.5),
@@ -268,7 +260,7 @@
 
   .btn.span2 { grid-column: span 2; }
 
-  /* PAYWALL OVERLAY */
+  /* ── PAYWALL OVERLAY ── */
   .overlay {
     position: fixed;
     inset: 0;
@@ -276,138 +268,268 @@
     backdrop-filter: none;
     z-index: 100;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease;
+    padding: 20px;
   }
 
   .overlay.active {
     opacity: 1;
     pointer-events: all;
-    backdrop-filter: blur(20px) saturate(1.4) brightness(0.7);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4) brightness(0.7);
-    background: rgba(10,10,30,0.3);
+    backdrop-filter: blur(24px) saturate(1.3) brightness(0.55);
+    -webkit-backdrop-filter: blur(24px) saturate(1.3) brightness(0.55);
+    background: rgba(6,6,20,0.45);
   }
 
-  .paywall {
-    background: var(--paywall-bg);
-    backdrop-filter: blur(40px) saturate(2);
-    -webkit-backdrop-filter: blur(40px) saturate(2);
-    border: 1px solid var(--paywall-border);
-    border-radius: 28px;
-    padding: 36px 28px 28px;
-    width: 340px;
-    max-width: calc(100vw - 40px);
+  /* header above cards */
+  .pw-header {
+    text-align: center;
+    margin-bottom: 28px;
+    transform: translateY(10px);
+    transition: transform 0.4s cubic-bezier(0.34,1.3,0.64,1) 0.05s;
+  }
+  .overlay.active .pw-header { transform: translateY(0); }
+
+  .pw-lock {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(80,120,255,0.22);
+    border: 1px solid rgba(100,150,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .pw-lock svg { width: 24px; height: 24px; fill: none; stroke: rgba(140,180,255,0.95); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .pw-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .pw-sub {
+    font-size: 14px;
+    color: rgba(200,215,255,0.65);
+    line-height: 1.5;
+    max-width: 440px;
+  }
+
+  /* ── 4 PLAN CARDS ── */
+  .plans-row {
+    display: flex;
+    gap: 14px;
+    align-items: stretch;
+    transform: translateY(16px);
+    transition: transform 0.4s cubic-bezier(0.34,1.3,0.64,1) 0.1s;
+    flex-wrap: nowrap;
+  }
+  .overlay.active .plans-row { transform: translateY(0); }
+
+  .plan-card {
+    flex: 1;
+    min-width: 148px;
+    max-width: 200px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 22px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    position: relative;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .plan-card:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.22);
+    transform: translateY(-3px);
+  }
+
+  .plan-card.selected {
+    background: rgba(80,120,255,0.18);
+    border-color: rgba(100,150,255,0.7);
+    box-shadow: 0 0 0 1px rgba(100,150,255,0.35), 0 8px 30px rgba(80,120,255,0.2);
+  }
+
+  .plan-card.popular {
+    border-color: rgba(100,150,255,0.5);
+  }
+
+  .badge {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #5078ff, #8040ff);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(80,120,255,0.4);
+  }
+
+  .plan-icon {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(140,170,255,0.7);
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+
+  .plan-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(200,215,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .plan-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-bottom: 14px;
+  }
+
+  .plan-price-dollar {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .plan-price-num {
+    font-size: 34px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .plan-price-period {
+    font-size: 12px;
+    color: rgba(200,215,255,0.5);
+    margin-left: 1px;
+  }
+
+  .plan-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin-bottom: 14px;
+  }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
+  }
+
+  .plan-features li {
+    font-size: 12px;
+    color: rgba(200,215,255,0.75);
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    line-height: 1.4;
+  }
+
+  .plan-features li .feat-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  .feat-icon.ok { color: #60d880; }
+  .feat-icon.no { color: rgba(255,255,255,0.25); }
+
+  .plan-features li.disabled { color: rgba(200,215,255,0.3); text-decoration: line-through; }
+
+  /* CTA Button */
+  .pw-cta-wrap {
+    margin-top: 22px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
-    transform: translateY(20px) scale(0.95);
-    transition: transform 0.35s cubic-bezier(0.34,1.3,0.64,1);
-    position: relative;
+    gap: 10px;
+    transform: translateY(10px);
+    transition: transform 0.4s cubic-bezier(0.34,1.3,0.64,1) 0.15s;
   }
+  .overlay.active .pw-cta-wrap { transform: translateY(0); }
 
-  .overlay.active .paywall {
-    transform: translateY(0) scale(1);
-  }
-
-  .paywall-close {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: rgba(200,210,255,0.7);
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  .paywall-close:hover { background: rgba(255,255,255,0.18); }
-
-  .lock-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(80,120,255,0.25);
-    border: 1px solid rgba(100,140,255,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 18px;
-  }
-
-  .lock-svg { width: 26px; height: 26px; fill: none; stroke: rgba(140,170,255,0.95); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-  .paywall-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--paywall-text);
-    text-align: center;
-    margin-bottom: 10px;
-    letter-spacing: -0.01em;
-  }
-
-  .paywall-sub {
-    font-size: 14px;
-    color: var(--paywall-sub);
-    text-align: center;
-    line-height: 1.55;
-    margin-bottom: 24px;
-    max-width: 260px;
-  }
-
-  .plan-option {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 14px;
-    padding: 14px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 10px;
-  }
-  .plan-option:hover { background: rgba(255,255,255,0.1); }
-  .plan-option.selected {
-    background: var(--paywall-selected);
-    border-color: var(--paywall-selected-border);
-  }
-
-  .plan-label { font-size: 14px; font-weight: 600; color: var(--paywall-text); }
-  .plan-desc { font-size: 12px; color: var(--paywall-sub); margin-top: 2px; }
-  .plan-price { font-size: 18px; font-weight: 700; color: var(--paywall-text); }
-  .plan-period { font-size: 11px; color: var(--paywall-sub); }
-
-  .pay-btn {
-    width: 100%;
+  .pw-cta {
     height: 52px;
-    background: var(--paywall-btn-active);
+    padding: 0 44px;
+    background: linear-gradient(135deg, #5078ff 0%, #7040ff 100%);
     border: none;
     border-radius: 14px;
     color: #fff;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 6px;
     transition: all 0.2s;
     letter-spacing: 0.01em;
-    box-shadow: 0 4px 20px rgba(80,120,255,0.4);
+    box-shadow: 0 4px 24px rgba(80,120,255,0.45);
   }
-  .pay-btn:hover { background: rgba(60,100,240,1); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(80,120,255,0.5); }
-  .pay-btn:active { transform: scale(0.98); }
+  .pw-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(80,120,255,0.55); filter: brightness(1.08); }
+  .pw-cta:active { transform: scale(0.98); }
 
-  /* ERROR MODAL */
+  .pw-cta.free-cta {
+    background: rgba(255,255,255,0.1);
+    box-shadow: none;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .pw-cta.free-cta:hover { background: rgba(255,255,255,0.16); box-shadow: none; }
+
+  .pw-dismiss {
+    font-size: 13px;
+    color: rgba(200,215,255,0.45);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px;
+  }
+  .pw-dismiss:hover { color: rgba(200,215,255,0.75); }
+
+  /* free plan preview strip */
+  .free-preview {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-top: auto;
+    font-size: 11px;
+    color: rgba(200,215,255,0.45);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* ── ERROR MODAL ── */
   .error-overlay {
     position: fixed;
     inset: 0;
@@ -485,6 +607,19 @@
     box-shadow: 0 4px 16px rgba(239,159,39,0.3);
   }
   .error-ok:hover { background: rgba(239,159,39,1); }
+
+  /* responsive: stack on narrow screens */
+  @media (max-width: 700px) {
+    .plans-row {
+      gap: 10px;
+    }
+    .plan-card {
+      min-width: 120px;
+      padding: 18px 12px 14px;
+    }
+    .plan-price-num { font-size: 26px; }
+    .pw-title { font-size: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -531,61 +666,124 @@
   </div>
 </div>
 
-<!-- Paywall Overlay -->
+<!-- ── Paywall Overlay ── -->
 <div class="overlay" id="paywall-overlay">
-  <div class="paywall">
-    <button class="paywall-close" onclick="closePaywall()" aria-label="Close">✕</button>
-    <div class="lock-icon">
-      <svg class="lock-svg" viewBox="0 0 24 24">
+
+  <div class="pw-header">
+    <div class="pw-lock">
+      <svg viewBox="0 0 24 24">
         <rect x="5" y="11" width="14" height="10" rx="2"/>
         <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
       </svg>
     </div>
-    <div class="paywall-title">Unlock the Solution</div>
-    <div class="paywall-sub">You've reached the limit of free calculations. Please choose a premium plan to see your result!</div>
-
-    <div class="plan-option" id="plan-one" onclick="selectPlan('one')">
-      <div>
-        <div class="plan-label">One-Time Calculation</div>
-        <div class="plan-desc">Unlock this specific answer</div>
-      </div>
-      <div style="text-align:right">
-        <div class="plan-price">$9.99</div>
-      </div>
-    </div>
-
-    <div class="plan-option selected" id="plan-pro" onclick="selectPlan('pro')">
-      <div>
-        <div class="plan-label">Calculator Pro</div>
-        <div class="plan-desc">Unlimited solutions</div>
-      </div>
-      <div style="text-align:right">
-        <div class="plan-price">$99.99</div>
-        <div class="plan-period">/mo</div>
-      </div>
-    </div>
-
-    <button class="pay-btn" onclick="payToUnlock()">Pay to Unlock</button>
+    <div class="pw-title">Upgrade to see your result</div>
+    <div class="pw-sub">Choose a plan that fits how you calculate — cancel anytime.</div>
   </div>
+
+  <div class="plans-row">
+
+    <!-- FREE -->
+    <div class="plan-card" id="card-free" onclick="selectPlan('free')">
+      <div class="plan-icon">Starter</div>
+      <div class="plan-name">Free</div>
+      <div class="plan-price-row">
+        <span class="plan-price-dollar">$</span>
+        <span class="plan-price-num">0</span>
+        <span class="plan-price-period">/mo</span>
+      </div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><span class="feat-icon ok">✓</span> See the equation</li>
+        <li class="disabled"><span class="feat-icon no">✕</span> No result shown</li>
+        <li class="disabled"><span class="feat-icon no">✕</span> No × or ÷</li>
+        <li class="disabled"><span class="feat-icon no">✕</span> No history</li>
+      </ul>
+      <div class="free-preview">View only — results hidden</div>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan-card selected" id="card-pro" onclick="selectPlan('pro')">
+      <div class="plan-icon">Essential</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price-row">
+        <span class="plan-price-dollar">$</span>
+        <span class="plan-price-num">99</span>
+        <span class="plan-price-period">/mo</span>
+      </div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><span class="feat-icon ok">✓</span> 100 solutions/mo</li>
+        <li><span class="feat-icon ok">✓</span> + and − operators</li>
+        <li class="disabled"><span class="feat-icon no">✕</span> No × or ÷</li>
+        <li class="disabled"><span class="feat-icon no">✕</span> No history</li>
+      </ul>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="plan-card popular" id="card-premium" onclick="selectPlan('premium')">
+      <div class="badge">Most Popular</div>
+      <div class="plan-icon">Advanced</div>
+      <div class="plan-name">Premium</div>
+      <div class="plan-price-row">
+        <span class="plan-price-dollar">$</span>
+        <span class="plan-price-num">299</span>
+        <span class="plan-price-period">/mo</span>
+      </div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><span class="feat-icon ok">✓</span> 600 solutions/mo</li>
+        <li><span class="feat-icon ok">✓</span> All operators</li>
+        <li><span class="feat-icon ok">✓</span> Full history</li>
+        <li class="disabled"><span class="feat-icon no">✕</span> No priority support</li>
+      </ul>
+    </div>
+
+    <!-- UNLIMITED -->
+    <div class="plan-card" id="card-unlimited" onclick="selectPlan('unlimited')">
+      <div class="plan-icon">Enterprise</div>
+      <div class="plan-name">Unlimited</div>
+      <div class="plan-price-row">
+        <span class="plan-price-dollar">$</span>
+        <span class="plan-price-num">599</span>
+        <span class="plan-price-period">/mo</span>
+      </div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><span class="feat-icon ok">✓</span> Unlimited solutions</li>
+        <li><span class="feat-icon ok">✓</span> All operators</li>
+        <li><span class="feat-icon ok">✓</span> Full history</li>
+        <li><span class="feat-icon ok">✓</span> Priority support</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="pw-cta-wrap">
+    <button class="pw-cta" id="pw-main-btn" onclick="payToUnlock()">Get Pro — $99 / month</button>
+    <button class="pw-dismiss" onclick="closePaywall()">Maybe later</button>
+  </div>
+
 </div>
 
 <!-- Error Modal -->
 <div class="error-overlay" id="error-overlay">
   <div class="error-modal">
-    <div class="error-icon">⚠️</div>
-    <div class="error-title">Payment Failed</div>
-    <div class="error-msg">This action could not be completed. Please try again in 24 hours.</div>
-    <button class="error-ok" onclick="closeError()">Got it</button>
+    <div class="error-icon">✕</div>
+    <div class="error-title">Transaction Declined</div>
+    <div class="error-msg">Your payment method was declined. Please verify your card details and try again.</div>
+    <button class="error-ok" onclick="closeError()">OK</button>
   </div>
 </div>
 
 <script>
+  // Zoom auf 200% setzen
+  document.documentElement.style.zoom = '100%';
+  
   let current = '0';
   let expression = '';
   let operator = null;
   let prevValue = null;
   let newInput = true;
-  let hasExpression = false;
   let rawExpr = '';
 
   function updateDisplay() {
@@ -625,9 +823,11 @@
   }
 
   function solve() {
-    if (operator === null || prevValue === null) { showPaywall(); return; }
-    const cur = parseFloat(current);
-    rawExpr = prevValue + ' ' + opSymbols[operator] + ' ' + cur + ' =';
+    if (operator !== null && prevValue !== null) {
+      const cur = parseFloat(current);
+      rawExpr = prevValue + ' ' + opSymbols[operator] + ' ' + cur + ' =';
+      updateDisplay();
+    }
     showPaywall();
   }
 
@@ -639,16 +839,31 @@
     document.getElementById('paywall-overlay').classList.remove('active');
   }
 
+  const planLabels = {
+    free:      { btn: 'Continue with Free', cls: 'free-cta' },
+    pro:       { btn: 'Get Pro — $99 / month', cls: '' },
+    premium:   { btn: 'Get Premium — $299 / month', cls: '' },
+    unlimited: { btn: 'Get Unlimited — $599 / month', cls: '' },
+  };
+
+  let selectedPlan = 'pro';
+
   function selectPlan(p) {
-    document.getElementById('plan-one').classList.toggle('selected', p === 'one');
-    document.getElementById('plan-pro').classList.toggle('selected', p === 'pro');
+    selectedPlan = p;
+    ['free','pro','premium','unlimited'].forEach(id => {
+      document.getElementById('card-' + id).classList.toggle('selected', id === p);
+    });
+    const btn = document.getElementById('pw-main-btn');
+    btn.textContent = planLabels[p].btn;
+    btn.className = 'pw-cta ' + planLabels[p].cls;
   }
 
   function payToUnlock() {
+    if (selectedPlan === 'free') { closePaywall(); return; }
     closePaywall();
     setTimeout(() => {
       document.getElementById('error-overlay').classList.add('active');
-    }, 250);
+    }, 260);
   }
 
   function closeError() {
