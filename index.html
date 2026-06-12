@@ -158,7 +158,7 @@
     border: 1px solid var(--glass-border);
     border-radius: 32px;
     padding: 20px;
-    width: 260px;
+    width: 320px;
     box-shadow:
       0 8px 32px var(--glass-shadow),
       inset 0 1px 0 rgba(255,255,255,0.5),
@@ -768,17 +768,14 @@
 <!-- Error Modal -->
 <div class="error-overlay" id="error-overlay">
   <div class="error-modal">
-    <div class="error-icon">✕</div>
-    <div class="error-title">Transaction Declined</div>
-    <div class="error-msg">Your payment method was declined. Please verify your card details and try again.</div>
-    <button class="error-ok" onclick="closeError()">OK</button>
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Payment Failed</div>
+    <div class="error-msg">This action could not be completed. Please try again in 24 hours.</div>
+    <button class="error-ok" onclick="closeError()">Got it</button>
   </div>
 </div>
 
 <script>
-  // Zoom auf 200% setzen
-  document.documentElement.style.zoom = '100%';
-  
   let current = '0';
   let expression = '';
   let operator = null;
